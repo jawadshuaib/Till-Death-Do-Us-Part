@@ -33,10 +33,10 @@
 </template>
 <script>
 import Header from "./Header.vue";
-import commonHelpers from "@/helpers/common";
+// import commonHelpers from "@/helpers/common";
 import blockchainHelpers from "@/helpers/blockchain";
 
-import web3 from "./../web3";
+// import web3 from "./../web3";
 import notesContract from "./../notes";
 
 export default {

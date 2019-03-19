@@ -163,6 +163,9 @@ export default {
             this.$emit("animate", { action: true });
           })
           .on("confirmation", (confirmationNumber, receipt) => {
+            console.log(
+              `Confirmation Number ${confirmationNumber} | ${receipt}`
+            );
             this.$emit("animate", { action: false });
             this.$router.push({
               name: "TransactionDetails",
