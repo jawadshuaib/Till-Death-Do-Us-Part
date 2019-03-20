@@ -1,3 +1,5 @@
+import CryptoJS from "crypto-js";
+
 export default {
   generateRandomDigits(length) {
     const chars = "abcdefghijkmnpqrstufwxyzABCDEFGHIJKLMNOPQRSTUFWXYZ23456789";
@@ -7,5 +9,11 @@ export default {
     }
 
     return result;
+  },
+  encryptSHA256(str) {
+    return CryptoJS.SHA256(str).toString();
+  },
+  encryptAES(str, key) {
+    return CryptoJS.AES.encrypt(str, key).toString();
   }
 };

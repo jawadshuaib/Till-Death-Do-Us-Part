@@ -1,31 +1,23 @@
 <template>
   <div id="app">
-    <!-- <Header></Header> -->
     <router-view/>
-    <!-- <Footer></Footer> -->
   </div>
 </template>
 
 <script>
-// import Header from "./components/Header.vue";
-// import Footer from "./components/Footer.vue";
-
 export default {
   name: "App",
   data() {
-    return {
-      shouldAnimate: false
-    };
-  },
-  components: {
-    // Header,
-    // Footer
-  },
-  methods: {
-    animate(payload) {
-      this.shouldAnimate = payload.action;
-    }
+    return {};
+    // return {
+    //   shouldAnimate: false
+    // };
   }
+  // methods: {
+  //   animate(payload) {
+  //     this.shouldAnimate = payload.action;
+  //   }
+  // }
 };
 </script>
 <style>

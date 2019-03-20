@@ -29,14 +29,14 @@
       </div>
       <!-- <button @click.prevent="getTransactionReceipt">Get Transaction Details</button> -->
     </div>
+    <Footer></Footer>
   </div>
 </template>
 <script>
 import Header from "./Header.vue";
-// import commonHelpers from "@/helpers/common";
+import Footer from "./Footer.vue";
 import blockchainHelpers from "@/helpers/blockchain";
 
-// import web3 from "./../web3";
 import notesContract from "./../notes";
 
 export default {
@@ -57,7 +57,8 @@ export default {
     };
   },
   components: {
-    Header
+    Header,
+    Footer
   },
   watch: {
     $route: "updateURLParams"
@@ -127,7 +128,9 @@ export default {
           .getNote(this.contract.token)
           .call();
 
+        // this.contract.dateCreated = c[0];
         this.contract.note = c[1];
+        // this.contract.noteOwnerHashed = c[2];
       }
     }
   }

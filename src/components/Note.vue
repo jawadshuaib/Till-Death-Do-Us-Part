@@ -21,19 +21,52 @@
       </div>
       <div class="card flow-text" v-else>
         <div class="card-content">
-          <p>Decrypted Note from the Blockchain</p>
-          <blockquote>{{ contract.note }}</blockquote>
+          <div class="progress" v-if="form.inProgress">
+            <div class="indeterminate"></div>
+          </div>
+          <p v-if="!form.editMode">Decrypted Note from the Blockchain</p>
+          <p v-else>Edit Note on the Blockchain</p>
+          <blockquote>
+            <span>{{ contract.noteCopy }}</span>
+          </blockquote>
+        </div>
+
+        <!-- Only display the option below if it's from the author of the note -->
+        <div v-if="form.isNoteOwner">
+          <div class="card-action" v-if="!form.editMode">
+            <button class="waves-effect waves-light btn-large" @click.prevent="form.editMode=true">
+              <i class="material-icons left">edit</i>Edit this Note
+            </button>
+          </div>
+          <div class="card-content" v-else>
+            <div class="input-field">
+              <textarea
+                id="note"
+                v-model="contract.noteCopy"
+                class="materialize-textarea active"
+                placeholder="Edit this Note"
+              ></textarea>
+            </div>
+            <button class="waves-effect waves-light btn-large lighten-2" @click.prevent="goBack">
+              <i class="material-icons left">replay</i>Go Back
+            </button>&nbsp;
+            <button class="waves-effect waves-light btn-large" @click.prevent="submitForm">
+              <i class="material-icons left">notes</i>Edit Note
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <Footer></Footer>
   </div>
 </template>
 <script>
 import Header from "./Header.vue";
-// import commonHelpers from "@/helpers/common";
+import Footer from "./Footer.vue";
+
+import commonHelpers from "@/helpers/common";
 import blockchainHelpers from "@/helpers/blockchain";
 
-// import web3 from "./../web3";
 import notesContract from "./../notes";
 
 import CryptoJS from "crypto-js";
@@ -43,27 +76,97 @@ export default {
   data() {
     return {
       contract: {
+        transactionHash: "",
         token: this.$route.params.token,
         whichNetwork: this.$route.params.whichNetwork,
         secretKey: "",
-        note: ""
+        dateCreated: 0,
+        note: "",
+        noteCopy: "",
+        noteOwnerHashed: ""
+      },
+      form: {
+        editMode: false,
+        isNoteOwner: false,
+        inProgress: false
       },
       decrypted: false,
       error: null
     };
   },
   components: {
-    Header
+    Header,
+    Footer
   },
   created() {
     // redirect if invalid token
+    // if (window.location.hostname != "localhost") {
     if (!blockchainHelpers.doesTokenExist(this.contract.token)) {
-      //   this.$router.push({
-      //     name: "/"
-      //   });
+      this.$router.push({
+        name: "/"
+      });
     }
+    // }
   },
   methods: {
+    // revert back to the original state
+    goBack() {
+      this.form.editMode = false;
+      this.contract.noteCopy = this.contract.note;
+    },
+    // check if the current user is the author of the note
+    async checkIfNoteOwner() {
+      const account = await blockchainHelpers.getAccount();
+      if (
+        commonHelpers.encryptSHA256(account) == this.contract.noteOwnerHashed
+      ) {
+        this.form.isNoteOwner = true;
+      }
+    },
+    async submitForm() {
+      let canSubmit = false;
+      if (this.contract.token !== null && this.contract.secretKey !== "") {
+        canSubmit = true;
+      }
+
+      let editedNote = this.contract.noteCopy;
+      if (canSubmit) {
+        if (editedNote !== "" && editedNote !== this.contract.note) {
+          // get the user's current account
+          const account = await blockchainHelpers.getAccount();
+
+          // encrypt the note
+          editedNote = commonHelpers.encryptAES(
+            editedNote,
+            this.contract.secretKey
+          );
+          await notesContract.methods
+            .editNote(
+              this.contract.token,
+              commonHelpers.encryptSHA256(account),
+              editedNote
+            )
+            .send({
+              from: account
+            })
+            .on("transactionHash", tx => {
+              this.contract.transactionHash = tx;
+              this.form.inProgress = true;
+            })
+            .on("confirmation", () => {
+              // this.$router.push({
+              //   name: "TransactionDetails",
+              //   params: {
+              //     transaction_id: this.contract.transactionHash,
+              //     token: this.contract.token,
+              //     secretKey: this.contract.secretKey,
+              //     whichNetwork: this.contract.whichNetwork
+              //   }
+              // });
+            });
+        }
+      }
+    },
     async getNote() {
       this.error = null;
       let shouldGetNote = false;
@@ -89,17 +192,19 @@ export default {
         }
 
         if (note !== "") {
+          this.contract.dateCreated = c[0];
           this.contract.note = note;
+          this.contract.noteCopy = note;
+          this.contract.noteOwnerHashed = c[2];
+
+          this.checkIfNoteOwner();
+
           this.decrypted = true;
         } else {
           this.error = "Incorrect secret key provided. Please try again.";
         }
       }
     }
-    // getNote() {
-    //   console.log(this.contract.token);
-    //   console.log(this.contract.whichNetwork);
-    // }
   }
 };
 </script>

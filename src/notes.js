@@ -1,8 +1,22 @@
 import web3 from "./web3";
 
-const address = "0x172328967a77ff498072ec8f1f10984811498801";
+const address = "0xc23484710345fa6e0888a1c8fb107be50ba6b899";
 
 const abi = [
+  {
+    constant: false,
+    inputs: [
+      { name: "token", type: "string" },
+      { name: "_dateCreated", type: "uint48" },
+      { name: "_noteOwnerHashed", type: "string" },
+      { name: "_encryptedNote", type: "string" }
+    ],
+    name: "createNote",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
+    type: "function"
+  },
   {
     constant: true,
     inputs: [{ name: "token", type: "string" }],
@@ -16,22 +30,13 @@ const abi = [
     constant: true,
     inputs: [{ name: "token", type: "string" }],
     name: "getNote",
-    outputs: [{ name: "", type: "uint48" }, { name: "", type: "string" }],
+    outputs: [
+      { name: "", type: "uint48" },
+      { name: "", type: "string" },
+      { name: "", type: "string" }
+    ],
     payable: false,
     stateMutability: "view",
-    type: "function"
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "token", type: "string" },
-      { name: "_dateCreated", type: "uint48" },
-      { name: "_encryptedNote", type: "string" }
-    ],
-    name: "createNote",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
     type: "function"
   },
   {
@@ -41,6 +46,19 @@ const abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
+    type: "function"
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: "token", type: "string" },
+      { name: "_noteOwnerHashed", type: "string" },
+      { name: "_newNote", type: "string" }
+    ],
+    name: "editNote",
+    outputs: [],
+    payable: false,
+    stateMutability: "nonpayable",
     type: "function"
   },
   {
