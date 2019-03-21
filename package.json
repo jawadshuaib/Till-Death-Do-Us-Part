@@ -12,7 +12,7 @@
     "jquery": "^3.3.1",
     "vue": "^2.6.6",
     "vue-router": "^3.0.2",
-    "web3": "^1.0.0-beta.48"
+    "web3": "^1.0.0-beta.37"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.4.0",
