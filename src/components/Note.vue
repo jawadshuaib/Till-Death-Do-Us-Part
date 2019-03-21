@@ -154,15 +154,15 @@ export default {
               this.form.inProgress = true;
             })
             .on("confirmation", () => {
-              // this.$router.push({
-              //   name: "TransactionDetails",
-              //   params: {
-              //     transaction_id: this.contract.transactionHash,
-              //     token: this.contract.token,
-              //     secretKey: this.contract.secretKey,
-              //     whichNetwork: this.contract.whichNetwork
-              //   }
-              // });
+              this.$router.push({
+                name: "TransactionDetails",
+                params: {
+                  transaction_id: this.contract.transactionHash,
+                  token: this.contract.token,
+                  secretKey: this.contract.secretKey,
+                  whichNetwork: this.contract.whichNetwork
+                }
+              });
             });
         }
       }
