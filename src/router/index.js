@@ -22,7 +22,10 @@ export default new Router({
     {
       path: "/note/:token/:whichNetwork",
       name: "Note",
-      component: Note
+      component: Note,
+      meta: {
+        windowRedirectAfter: true
+      }
     }
   ]
 });

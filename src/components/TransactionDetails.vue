@@ -24,7 +24,7 @@
           <router-link
             class="truncate"
             :to="{ name: 'Note', params: { token: contract.token, whichNetwork: contract.whichNetwork } }"
-          >{{ url.note }}</router-link>
+           target="_blank">{{ url.note }}</router-link>
         </div>
       </div>
       <!-- <button @click.prevent="getTransactionReceipt">Get Transaction Details</button> -->
@@ -81,8 +81,8 @@ export default {
         String(this.contract.transactionID);
     }
 
-    const hostName = window.location.hostname;
-    // https://till-death-do-us-part.firebaseapp.com
+    let hostName = window.location.hostname;
+    hostName = hostName !== "localhost" ? `https://${hostName}` : hostName;
     this.url.note = `${hostName}/note/${this.contract.token}/${
       this.contract.whichNetwork
     }`;
@@ -104,11 +104,6 @@ export default {
       this.transactionID = this.$route.params.transaction_id;
       this.token = this.$route.params.token;
     },
-    // async getTransactionReceipt() {
-    //   const trans = await web3.eth.getTransactionReceipt(
-    //     this.contract.transactionID
-    //   );
-    // },
     async getNote() {
       let shouldGetNote = false;
       if (this.contract.token !== "") {
@@ -130,7 +125,6 @@ export default {
 
         // this.contract.dateCreated = c[0];
         this.contract.note = c[1];
-        // this.contract.noteOwnerHashed = c[2];
       }
     }
   }

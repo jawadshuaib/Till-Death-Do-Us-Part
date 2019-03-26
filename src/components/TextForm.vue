@@ -67,10 +67,6 @@ import notesContract from "./../notes";
 
 import CryptoJS from "crypto-js";
 
-global.jQuery = require("jquery");
-var $ = global.jQuery;
-window.$ = $;
-
 export default {
   name: "TextForm",
   data() {
@@ -104,7 +100,7 @@ export default {
     },
     async submitForm() {
       this.form.token = commonHelpers.generateRandomDigits(8);
-      this.form.secretKey = commonHelpers.generateRandomDigits(8);
+      this.form.secretKey = commonHelpers.generateRandomDigits(15);
 
       const token = this.form.token;
 
@@ -135,9 +131,6 @@ export default {
       }
       return this.error === null ? true : false;
     },
-    // encryptNote(note) {
-    //   return CryptoJS.AES.encrypt(note, this.form.secretKey).toString();
-    // },
     async createNote(token, dateCreated, note) {
       // submit the form
       const account = await blockchainHelpers.getAccount();
@@ -163,10 +156,8 @@ export default {
           .on("transactionHash", tx => {
             this.contract.transactionHash = tx;
             runProgressBar();
-            // this.$emit("animate", { action: true });
           })
           .on("confirmation", () => {
-            // this.$emit("animate", { action: false });
             this.$router.push({
               name: "TransactionDetails",
               params: {
@@ -183,32 +174,7 @@ export default {
   async created() {
     this.contract.owner = await notesContract.methods.owner().call();
   }
-  // updated() {
-  //   $(document).ready(function() {
-  //     // resize textarea
-  //     // M.updateTextFields();
-  //     // M.textareaAutoResize($("#note"));
-  //   });
-  //   // $("document").on("keypress", function(e) {
-  //   //   $("#note").focus();
-  //   // });
-  // }
 };
-
-$(document).ready(function() {
-  // keep waves at the bottom as additional lines of the note are added
-  $("#note").on("keypress", function(e) {
-    const text = $(this).val();
-    const lines = text.split(/\r|\r\n|\n/);
-    const totalLines = lines.length;
-
-    if (totalLines > 3) {
-      if (e.which == 13) {
-        $(".ocean").css("bottom", `-${totalLines * 48}px`);
-      }
-    }
-  });
-});
 
 function runProgressBar() {
   const container = document.getElementById("progress-bar-container");
@@ -216,7 +182,7 @@ function runProgressBar() {
 
   let elem = document.getElementById("progress-bar");
   let width = 0;
-  let id = setInterval(frame, 200);
+  let id = setInterval(frame, 230);
   function frame() {
     if (width >= 100) {
       elem.innerHTML = "Your note has been submitted successfully! Stand by...";
