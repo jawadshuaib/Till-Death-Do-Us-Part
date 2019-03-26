@@ -2,6 +2,11 @@
   <div class="row">
     <Header></Header>
     <div class="container">
+      <div class="card">
+        <div class="card-content" v-if="decrypted">
+          <p>Save this link to access this note anytime in the future.</p>
+        </div>
+      </div>
       <div class="card flow-text" v-if="!decrypted">
         <div class="card-content">
           <p>Access the Encrypted Note</p>
