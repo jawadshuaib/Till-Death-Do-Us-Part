@@ -15,12 +15,12 @@ export default new Router({
       component: TextForm
     },
     {
-      path: "/details/:transaction_id/:token/:secretKey/:whichNetwork",
+      path: "/details/:version/:transaction_id/:token/:secretKey/:whichNetwork",
       name: "TransactionDetails",
       component: TransactionDetails
     },
     {
-      path: "/note/:token/:whichNetwork",
+      path: "/note/:version/:token/:whichNetwork",
       name: "Note",
       component: Note,
       meta: {

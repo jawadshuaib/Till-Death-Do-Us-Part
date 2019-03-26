@@ -63,19 +63,20 @@
 <script>
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
-
 import commonHelpers from "@/helpers/common";
 import blockchainHelpers from "@/helpers/blockchain";
-
-import notesContract from "./../notes";
-
+import web3 from "./../web3";
+// import notesContract from "./../notes";
 import CryptoJS from "crypto-js";
+
+let notesContract;
 
 export default {
   name: "Note",
   data() {
     return {
       contract: {
+        version: this.$route.params.version,
         transactionHash: "",
         token: this.$route.params.token,
         whichNetwork: this.$route.params.whichNetwork,
@@ -98,15 +99,25 @@ export default {
     Header,
     Footer
   },
-  created() {
+  async created() {
     // redirect if invalid token
-    // if (window.location.hostname != "localhost") {
     if (!blockchainHelpers.doesTokenExist(this.contract.token)) {
       this.$router.push({
         name: "/"
       });
     }
-    // }
+
+    const version = this.contract.version;
+    if ((await blockchainHelpers.doesContractVersionExist(version)) === true) {
+      this.error = null;
+      const contractDetails = await blockchainHelpers.getContract(version);
+      const contractAddress = contractDetails[0];
+      const contractAbi = JSON.parse(contractDetails[1]);
+
+      notesContract = new web3.eth.Contract(contractAbi, contractAddress);
+    } else {
+      this.error = "Incorrect version specified for the note.";
+    }
   },
   methods: {
     // revert back to the original state

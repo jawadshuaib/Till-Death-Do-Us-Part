@@ -73,7 +73,8 @@ export default {
     return {
       contract: {
         owner: null,
-        transactionHash: null
+        transactionHash: null,
+        version: 1
       },
       networks: {
         test: "Test Network",
@@ -161,9 +162,10 @@ export default {
             this.$router.push({
               name: "TransactionDetails",
               params: {
+                version: this.contract.version,
                 transaction_id: this.contract.transactionHash,
                 token: this.form.token,
-                secretKey: this.form.secretKey,
+                secretKey: this.form.secretKey,                
                 whichNetwork: this.isTest === true ? "rinkeby" : "mainnet"
               }
             });

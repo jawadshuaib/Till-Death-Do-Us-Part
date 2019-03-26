@@ -2,7 +2,7 @@
   <div class="row">
     <Header></Header>
     <div class="container">
-      <div class="card">
+      <div class="card" v-if="error===null">
         <div class="card-content flow-text">
           <p>
             Your note has been encrypted and
@@ -24,8 +24,12 @@
           <router-link
             class="truncate"
             :to="{ name: 'Note', params: { token: contract.token, whichNetwork: contract.whichNetwork } }"
-           target="_blank">{{ url.note }}</router-link>
+            target="_blank"
+          >{{ url.note }}</router-link>
         </div>
+      </div>
+      <div class="card flow-text" v-if="error!==null">
+        <div class="card-content red lighten-2 white-text">{{ error }}</div>
       </div>
       <!-- <button @click.prevent="getTransactionReceipt">Get Transaction Details</button> -->
     </div>
@@ -36,18 +40,23 @@
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
 import blockchainHelpers from "@/helpers/blockchain";
+import web3 from "./../web3";
 
-import notesContract from "./../notes";
+// import notesContract from "./../notes";
+
+let notesContract;
 
 export default {
   name: "TransactionDetails",
   data() {
     return {
+      error: "",
       url: {
         etherscan: "",
         note: ""
       },
       contract: {
+        version: this.$route.params.version,
         transactionID: this.$route.params.transaction_id,
         token: this.$route.params.token,
         secretKey: this.$route.params.secretKey,
@@ -87,14 +96,27 @@ export default {
       this.contract.whichNetwork
     }`;
 
-    this.contract.owner = await notesContract.methods.owner().call();
-    this.getNote();
+    const version = this.contract.version;
+    if ((await blockchainHelpers.doesContractVersionExist(version)) === true) {
+      this.error = null;
+      const contractDetails = await blockchainHelpers.getContract(version);
+      const contractAddress = contractDetails[0];
+      const contractAbi = JSON.parse(contractDetails[1]);
+
+      notesContract = new web3.eth.Contract(contractAbi, contractAddress);
+
+      this.contract.owner = await notesContract.methods.owner().call();
+      this.getNote();
+    } else {
+      this.error = "Incorrect version specified for the note.";
+    }
   },
   methods: {
     visitNotePage() {
       this.$router.push({
         name: "Note",
         params: {
+          version: this.contract.version,
           token: this.form.token,
           whichNetwork: this.whichNetwork
         }
